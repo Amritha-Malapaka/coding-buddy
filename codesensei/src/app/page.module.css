@@ -1,0 +1,111 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  font-family: var(--font-inter), sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-family: var(--font-outfit), sans-serif;
+  font-size: 32px;
+  color: var(--text-main);
+  margin-bottom: var(--spacing-sm);
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+.primaryAction {
+  padding: 12px 24px;
+  background-color: var(--accent-primary);
+  color: var(--text-light);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+
+.primaryAction:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  opacity: 0.9;
+}
+
+.gridContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+}
+
+.card {
+  background-color: #FFFFFF;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.fullWidthCard {
+  grid-column: 1 / -1;
+}
+
+.cardHeader h2 {
+  font-family: var(--font-outfit), sans-serif;
+  font-size: 20px;
+  margin-bottom: var(--spacing-sm);
+}
+
+.insightText {
+  color: var(--accent-primary);
+  font-size: 14px;
+}
+
+.cardBody {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  min-height: 200px;
+}
+
+.dnaInsights {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.insightItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--bg-tertiary);
+}
+
+.insightItem:nth-child(2) {
+  border-left: 4px solid #d9534f;
+}
+
+.insightItem:nth-child(3) {
+  border-left: 4px solid var(--accent-primary);
+}
+
+.insightIcon {
+  font-size: 24px;
+}

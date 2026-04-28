@@ -1,0 +1,152 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  height: 100%;
+}
+
+.header {
+  margin-bottom: var(--spacing-sm);
+}
+
+.title {
+  font-family: var(--font-outfit), sans-serif;
+  font-size: 28px;
+}
+
+.subtitle {
+  color: var(--text-muted);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: var(--spacing-xl);
+  flex: 1;
+}
+
+.leftColumn, .rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.card {
+  background-color: #FFFFFF;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: var(--spacing-sm);
+}
+
+.cardHeader h2 {
+  font-family: var(--font-outfit), sans-serif;
+  font-size: 18px;
+}
+
+.editBtn {
+  font-size: 13px;
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.editBtn:hover {
+  text-decoration: underline;
+}
+
+.heatmapWrapper {
+  flex: 1;
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  min-height: 250px;
+}
+
+.resourceList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.resourceItem {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-primary);
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.resourceItem:hover {
+  border-color: var(--accent-primary);
+  transform: translateX(4px);
+  background-color: #FFFFFF;
+  box-shadow: var(--shadow-sm);
+}
+
+.resourceIcon {
+  font-size: 24px;
+}
+
+.resourceContent h4 {
+  font-size: 15px;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+
+.resourceContent p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.badge {
+  background-color: rgba(124, 129, 86, 0.1);
+  color: var(--accent-primary);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.dnaList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.dnaList li {
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px dashed var(--border-light);
+  font-size: 14px;
+  color: var(--text-main);
+}
+
+.dnaList li:last-child {
+  border-bottom: none;
+}
+
+.dnaList strong {
+  color: var(--text-main);
+}
+
+.danger {
+  color: #d9534f !important;
+}
+
+.warning {
+  color: #f0ad4e !important;
+}

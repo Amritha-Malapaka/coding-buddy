@@ -1,0 +1,92 @@
+.card {
+  background-color: #FFFFFF;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: var(--spacing-md);
+}
+
+.header h2 {
+  font-family: var(--font-outfit), sans-serif;
+  font-size: 20px;
+}
+
+.statusBadge {
+  background-color: #FFF3CD;
+  color: #856404;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.metric {
+  background-color: var(--bg-primary);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.metricLabel {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.metricValueLine {
+  font-family: var(--font-outfit), sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.complexityWarning {
+  color: #d9534f;
+}
+
+.complexityGood {
+  color: var(--accent-primary);
+}
+
+.metricDesc {
+  font-size: 13px;
+  color: var(--text-main);
+  line-height: 1.4;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section h3 {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 16px;
+  color: var(--accent-primary);
+}
+
+.section p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-main);
+}
