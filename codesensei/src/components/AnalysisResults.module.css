@@ -1,34 +1,53 @@
 .card {
-  background-color: #FFFFFF;
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-light);
+  background-color: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-xl);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-subtle);
   padding-bottom: var(--spacing-md);
 }
 
-.header h2 {
+.title {
   font-family: var(--font-outfit), sans-serif;
-  font-size: 20px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-main);
 }
 
 .statusBadge {
-  background-color: #FFF3CD;
-  color: #856404;
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: 20px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.statusBadge.warning {
+  background-color: rgba(196, 165, 116, 0.15);
+  color: var(--status-warning);
+  border-color: rgba(196, 165, 116, 0.3);
+}
+
+.statusBadge.success {
+  background-color: rgba(125, 155, 118, 0.15);
+  color: var(--status-success);
+  border-color: rgba(125, 155, 118, 0.3);
+}
+
+.statusBadge.error {
+  background-color: rgba(184, 112, 112, 0.15);
+  color: var(--status-error);
+  border-color: rgba(184, 112, 112, 0.3);
 }
 
 .metricsGrid {
@@ -38,55 +57,67 @@
 }
 
 .metric {
-  background-color: var(--bg-primary);
+  background-color: var(--bg-tertiary);
   padding: var(--spacing-md);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--spacing-xs);
+  border: 1px solid var(--border-subtle);
 }
 
 .metricLabel {
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
   color: var(--text-muted);
   font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 .metricValueLine {
   font-family: var(--font-outfit), sans-serif;
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: 600;
 }
 
-.complexityWarning {
-  color: #d9534f;
+.warning {
+  color: var(--status-warning);
 }
 
-.complexityGood {
-  color: var(--accent-primary);
+.good {
+  color: var(--status-success);
+}
+
+.error {
+  color: var(--status-error);
 }
 
 .metricDesc {
   font-size: 13px;
-  color: var(--text-main);
+  color: var(--text-secondary);
   line-height: 1.4;
 }
 
 .section {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--spacing-sm);
 }
 
 .section h3 {
   font-family: var(--font-inter), sans-serif;
-  font-size: 16px;
-  color: var(--accent-primary);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main);
 }
 
 .section p {
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.section strong {
   color: var(--text-main);
+  font-weight: 500;
 }

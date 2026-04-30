@@ -1,46 +1,124 @@
 .heatmapContainer {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
   align-items: center;
   justify-content: center;
   padding: var(--spacing-md);
   width: 100%;
   height: 100%;
+  position: relative;
 }
 
-.bubble {
+.skillNode {
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #FFFFFF;
+  color: var(--text-light);
   font-family: var(--font-inter), sans-serif;
   font-weight: 600;
-  font-size: 14px;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.3s ease;
-  cursor: default;
+  font-size: 13px;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+  cursor: pointer;
+  position: relative;
+  border: 2px solid transparent;
 }
 
-.bubble:hover {
-  transform: scale(1.05);
+.skillNode:hover {
+  transform: scale(1.08);
+  box-shadow: var(--shadow-glow);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
-.bubble.strong {
-  background-color: var(--accent-primary);
+/* Strong proficiency - green gradient */
+.skillNode.strong {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-muted) 100%);
 }
 
-.bubble.medium {
-  background-color: var(--bg-tertiary);
+/* Medium proficiency - neutral gradient */
+.skillNode.medium {
+  background: linear-gradient(135deg, #5a6a5a 0%, #3d4a3d 100%);
 }
 
-.bubble.weak {
-  background-color: #d9534f;
+/* Weak proficiency - warm gradient */
+.skillNode.weak {
+  background: linear-gradient(135deg, #8b6f6f 0%, #5a4a4a 100%);
 }
 
-.bubbleText {
+.skillName {
   text-align: center;
   padding: var(--spacing-sm);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+/* Tooltip styles */
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.95);
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  min-width: 160px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-fast);
+  z-index: 10;
+  box-shadow: var(--shadow-lg);
+}
+
+.tooltipVisible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) scale(1);
+}
+
+.tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--border-light);
+}
+
+.tooltipHeader {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-main);
+  margin-bottom: var(--spacing-xs);
+}
+
+.tooltipLevel {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-sm);
+}
+
+.tooltipStats {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.tooltipProgress {
+  height: 4px;
+  background-color: var(--bg-tertiary);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.tooltipProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  border-radius: 2px;
+  transition: width var(--transition-slow);
 }

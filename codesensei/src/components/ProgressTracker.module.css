@@ -14,29 +14,32 @@
 
 .progressValue {
   font-family: var(--font-outfit), sans-serif;
-  font-size: 28px;
-  font-weight: 700;
+  font-size: 32px;
+  font-weight: 600;
   color: var(--accent-primary);
+  letter-spacing: -1px;
 }
 
 .progressTimeRemaining {
   font-size: 14px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .progressBarWrapper {
-  height: 12px;
+  height: 8px;
   width: 100%;
   background-color: var(--bg-secondary);
-  border-radius: var(--radius-lg);
+  border-radius: 4px;
   overflow: hidden;
+  border: 1px solid var(--border-subtle);
 }
 
 .progressBarFill {
   height: 100%;
-  background-color: var(--accent-primary);
-  border-radius: var(--radius-lg);
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  border-radius: 4px;
   transition: width 1s ease-out;
+  box-shadow: 0 0 10px rgba(125, 155, 118, 0.3);
 }
 
 .statsGrid {
@@ -47,27 +50,33 @@
 }
 
 .statBox {
-  background-color: #FFFFFF;
-  border: 1px solid var(--border-light);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: var(--spacing-md);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: var(--spacing-xs);
+  transition: border-color var(--transition-fast);
+}
+
+.statBox:hover {
+  border-color: var(--border-light);
 }
 
 .statValue {
   font-family: var(--font-outfit), sans-serif;
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 600;
   color: var(--text-main);
 }
 
 .statLabel {
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
   color: var(--text-muted);
   letter-spacing: 0.5px;
+  font-weight: 500;
 }
