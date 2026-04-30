@@ -2,127 +2,69 @@
 
 import styles from "./AnalysisResults.module.css";
 
+interface AnalysisData {
+  time_complexity: { complexity: string; confidence: string; reason: string };
+  space_complexity: { complexity: string; confidence: string; reason: string };
+  patterns: Array<{ name: string; type: string }>;
+  bottlenecks: Array<{ type: string; issue: string; impact: string; fix: string }>;
+  suggestions: Array<{ priority: string; category: string; suggestion: string; reason: string }>;
+  metrics: { total_lines: number; code_lines: number; functions: number; loops: number; conditionals: number };
+}
+
 interface AnalysisResultsProps {
   code: string;
   problem?: string;
+  analysis?: AnalysisData;
 }
 
-interface AnalysisResult {
-  status: string;
-  statusType: "warning" | "success" | "error";
-  timeComplexity: string;
-  timeComplexityType: "good" | "warning" | "error";
-  spaceComplexity: string;
-  spaceComplexityType: "good" | "warning" | "error";
-  timeDesc: string;
-  spaceDesc: string;
-  scalabilityTitle: string;
-  scalabilityText: string;
-  optimalTitle: string;
-  optimalText: string;
+function getComplexityType(complexity: string): "good" | "warning" | "error" {
+  if (complexity.includes("N²") || complexity.includes("2^N") || complexity.includes("N!")) {
+    return "error";
+  }
+  if (complexity.includes("N log N") || complexity.includes("log N")) {
+    return "warning";
+  }
+  return "good";
 }
 
-function analyzeCode(code: string): AnalysisResult {
-  const codeLower = code.toLowerCase();
-  
-  // Check for recursion patterns
-  if (codeLower.includes("recursive") || code.includes("function") && code.includes("(") && code.split("(").length > 2) {
-    return {
-      status: "Recursive approach",
-      statusType: "warning",
-      timeComplexity: "O(2^N)",
-      timeComplexityType: "error",
-      spaceComplexity: "O(N)",
-      spaceComplexityType: "warning",
-      timeDesc: "Exponential time due to repeated calculations.",
-      spaceDesc: "Call stack grows with recursion depth.",
-      scalabilityTitle: "Stack Overflow Risk",
-      scalabilityText: "Deep recursion may cause stack overflow for large inputs. Consider memoization or iterative approach.",
-      optimalTitle: "Memoization (DP)",
-      optimalText: "Cache intermediate results to avoid redundant calculations. Reduces time to O(N) with O(N) space.",
-    };
+function getStatusFromAnalysis(analysis: AnalysisData): { status: string; statusType: "good" | "warning" | "error" } {
+  const timeType = getComplexityType(analysis.time_complexity.complexity);
+  if (timeType === "error") {
+    return { status: "Needs Optimization", statusType: "error" };
   }
-  
-  // Check for nested loops
-  if ((code.match(/for/g) || []).length >= 2 || (code.match(/while/g) || []).length >= 2) {
-    return {
-      status: "Works, but inefficient",
-      statusType: "warning",
-      timeComplexity: "O(N²)",
-      timeComplexityType: "warning",
-      spaceComplexity: "O(1)",
-      spaceComplexityType: "good",
-      timeDesc: "Nested loops iterate over elements multiple times.",
-      spaceDesc: "No additional memory allocated for data structures.",
-      scalabilityTitle: "Scalability Issues",
-      scalabilityText: "This approach will time out for inputs larger than 10^4 elements. Consider more efficient algorithms.",
-      optimalTitle: "Hash Map Optimization",
-      optimalText: "Use a hash map to achieve O(1) lookups. Overall time complexity becomes O(N) with O(N) space trade-off.",
-    };
+  if (analysis.bottlenecks.length > 0) {
+    return { status: "Could Be Improved", statusType: "warning" };
   }
-  
-  // Check for sorting
-  if (codeLower.includes("sort") || codeLower.includes("sorted")) {
-    return {
-      status: "Optimal sorting used",
-      statusType: "success",
-      timeComplexity: "O(N log N)",
-      timeComplexityType: "good",
-      spaceComplexity: "O(1) or O(N)",
-      spaceComplexityType: "good",
-      timeDesc: "Efficient comparison-based sorting algorithm.",
-      spaceDesc: "Depends on sort implementation used.",
-      scalabilityTitle: "Good Scalability",
-      scalabilityText: "N log N complexity handles large datasets well. Consider if linear time is achievable.",
-      optimalTitle: "Counting/Radix Sort",
-      optimalText: "For integer ranges, O(N) sorting is possible. Only beneficial for very large datasets.",
-    };
+  if (timeType === "warning") {
+    return { status: "Good Approach", statusType: "warning" };
   }
-  
-  // Check for hash map usage
-  if (codeLower.includes("map") || codeLower.includes("object") || codeLower.includes("set") || codeLower.includes("dict")) {
-    return {
-      status: "Optimal approach",
-      statusType: "success",
-      timeComplexity: "O(N)",
-      timeComplexityType: "good",
-      spaceComplexity: "O(N)",
-      spaceComplexityType: "warning",
-      timeDesc: "Single pass with O(1) hash map operations.",
-      spaceDesc: "Hash map stores up to N elements.",
-      scalabilityTitle: "Excellent Scalability",
-      scalabilityText: "Linear time complexity handles millions of elements efficiently.",
-      optimalTitle: "Space Optimization",
-      optimalText: "If memory is constrained, consider two-pointer approach for O(1) space at O(N log N) time cost.",
-    };
-  }
-  
-  // Default single loop
-  return {
-    status: "Clean implementation",
-    statusType: "success",
-    timeComplexity: "O(N)",
-    timeComplexityType: "good",
-    spaceComplexity: "O(1)",
-    spaceComplexityType: "good",
-    timeDesc: "Single iteration over input data.",
-    spaceDesc: "Constant extra space used.",
-    scalabilityTitle: "Good Scalability",
-    scalabilityText: "Linear time handles large inputs well. Verify no hidden complexity in utility functions.",
-    optimalTitle: "Already Optimal",
-    optimalText: "This approach is already optimal for most cases. Consider parallel processing for massive datasets.",
-  };
+  return { status: "Optimal Solution", statusType: "good" };
 }
 
-export default function AnalysisResults({ code, problem }: AnalysisResultsProps) {
-  const analysis = analyzeCode(code);
-  
+export default function AnalysisResults({ code, problem, analysis }: AnalysisResultsProps) {
+  // Fallback to local analysis if no API data provided
+  if (!analysis) {
+    return (
+      <div className={styles.card}>
+        <div className={styles.header}>
+          <h2 className={styles.title}>Analysis Results</h2>
+          <span className={styles.statusBadge}>No analysis available</span>
+        </div>
+        <p className={styles.noData}>Submit code to see analysis results.</p>
+      </div>
+    );
+  }
+
+  const { status, statusType } = getStatusFromAnalysis(analysis);
+  const timeType = getComplexityType(analysis.time_complexity.complexity);
+  const spaceType = getComplexityType(analysis.space_complexity.complexity);
+
   return (
     <div className={styles.card}>
       <div className={styles.header}>
         <h2 className={styles.title}>Analysis Results</h2>
-        <span className={`${styles.statusBadge} ${styles[analysis.statusType]}`}>
-          {analysis.status}
+        <span className={`${styles.statusBadge} ${styles[statusType]}`}>
+          {status}
         </span>
       </div>
 
@@ -130,27 +72,63 @@ export default function AnalysisResults({ code, problem }: AnalysisResultsProps)
         <div className={styles.metric}>
           <span className={styles.metricLabel}>Time Complexity</span>
           <span className={styles.metricValueLine}>
-            <span className={styles[analysis.timeComplexityType]}>{analysis.timeComplexity}</span>
+            <span className={styles[timeType]}>{analysis.time_complexity.complexity}</span>
           </span>
-          <p className={styles.metricDesc}>{analysis.timeDesc}</p>
+          <p className={styles.metricDesc}>{analysis.time_complexity.reason}</p>
         </div>
         <div className={styles.metric}>
           <span className={styles.metricLabel}>Space Complexity</span>
           <span className={styles.metricValueLine}>
-            <span className={styles[analysis.spaceComplexityType]}>{analysis.spaceComplexity}</span>
+            <span className={styles[spaceType]}>{analysis.space_complexity.complexity}</span>
           </span>
-          <p className={styles.metricDesc}>{analysis.spaceDesc}</p>
+          <p className={styles.metricDesc}>{analysis.space_complexity.reason}</p>
         </div>
       </div>
 
-      <div className={styles.section}>
-        <h3>{analysis.scalabilityTitle}</h3>
-        <p>{analysis.scalabilityText}</p>
-      </div>
+      {analysis.patterns.length > 0 && (
+        <div className={styles.section}>
+          <h3>Detected Patterns</h3>
+          <div className={styles.tags}>
+            {analysis.patterns.map((pattern, idx) => (
+              <span key={idx} className={styles.tag}>{pattern.name}</span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {analysis.bottlenecks.length > 0 && (
+        <div className={styles.section}>
+          <h3>Potential Bottlenecks</h3>
+          {analysis.bottlenecks.map((b, idx) => (
+            <div key={idx} className={styles.bottleneck}>
+              <strong>{b.issue}</strong>
+              <p>{b.impact}</p>
+              <span className={styles.fix}>Fix: {b.fix}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {analysis.suggestions.length > 0 && (
+        <div className={styles.section}>
+          <h3>Suggestions</h3>
+          {analysis.suggestions.map((s, idx) => (
+            <div key={idx} className={`${styles.suggestion} ${styles[s.priority]}`}>
+              <strong>{s.suggestion}</strong>
+              <p>{s.reason}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className={styles.section}>
-        <h3>{analysis.optimalTitle}</h3>
-        <p>{analysis.optimalText}</p>
+        <h3>Code Metrics</h3>
+        <div className={styles.metricsRow}>
+          <span>{analysis.metrics.code_lines} lines</span>
+          <span>{analysis.metrics.functions} functions</span>
+          <span>{analysis.metrics.loops} loops</span>
+          <span>{analysis.metrics.conditionals} conditionals</span>
+        </div>
       </div>
     </div>
   );

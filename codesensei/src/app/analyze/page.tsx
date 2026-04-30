@@ -5,10 +5,19 @@ import styles from "./page.module.css";
 import CodeInput from "@/components/CodeInput";
 import AnalysisResults from "@/components/AnalysisResults";
 import ThoughtProcessReplay from "@/components/ThoughtProcessReplay";
+import { analysisApi } from "@/lib/api";
 
 interface AnalysisData {
   problem: string;
   code: string;
+  analysis: {
+    time_complexity: { complexity: string; confidence: string; reason: string };
+    space_complexity: { complexity: string; confidence: string; reason: string };
+    patterns: Array<{ name: string; type: string }>;
+    bottlenecks: Array<{ type: string; issue: string; impact: string; fix: string }>;
+    suggestions: Array<{ priority: string; category: string; suggestion: string; reason: string }>;
+    metrics: { total_lines: number; code_lines: number; functions: number; loops: number; conditionals: number };
+  };
   timestamp: number;
 }
 
@@ -23,17 +32,17 @@ export default function AnalyzePage() {
     setAnalysisData(null);
 
     try {
-      // Simulate API analysis with unique data per input
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Store the unique analysis data based on input
+      // Call real API for analysis
+      const result = await analysisApi.analyze(problem, code);
+      
       setAnalysisData({
         problem,
         code,
+        analysis: result.analysis,
         timestamp: Date.now(),
       });
     } catch (err) {
-      setError("Analysis failed. Please try again.");
+      setError(err instanceof Error ? err.message : "Analysis failed. Please try again.");
     } finally {
       setIsAnalyzing(false);
     }

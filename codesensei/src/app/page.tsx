@@ -1,8 +1,32 @@
+"use client";
+
 import styles from "./page.module.css";
 import SkillHeatmap from "@/components/SkillHeatmap";
 import ProgressTracker from "@/components/ProgressTracker";
+import { progressApi } from "@/lib/api";
+import { useProgress } from "@/hooks/useApi";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function Dashboard() {
+  const router = useRouter();
+  const { data: progress, loading, error, refetch } = useProgress();
+  const [completing, setCompleting] = useState(false);
+
+  const handleStartChallenge = async () => {
+    setCompleting(true);
+    try {
+      await progressApi.completeChallenge(1);
+      await refetch();
+      router.push('/analyze');
+    } catch (err) {
+      console.error('Failed to start challenge:', err);
+      router.push('/analyze');
+    } finally {
+      setCompleting(false);
+    }
+  };
+
   return (
     <div className={styles.dashboard}>
       <header className={styles.header}>
@@ -10,33 +34,58 @@ export default function Dashboard() {
           <h1 className={styles.title}>Dashboard</h1>
           <p className={styles.subtitle}>Track your progress and identify areas for improvement.</p>
         </div>
-        <button className={styles.primaryAction}>Start Next Challenge</button>
+        <button 
+          className={styles.primaryAction} 
+          onClick={handleStartChallenge}
+          disabled={completing}
+        >
+          {completing ? 'Starting...' : 'Start Next Challenge'}
+        </button>
       </header>
 
-      <div className={styles.gridContainer}>
-        <section className={styles.card}>
-          <div className={styles.cardHeader}>
-            <div>
-              <h2 className={styles.cardTitle}>Skill Heatmap</h2>
-              <p className={styles.cardSubtitle}>Focus areas: Graphs, Dynamic Programming</p>
-            </div>
-          </div>
-          <div className={styles.cardBody}>
-            <SkillHeatmap />
-          </div>
-        </section>
+      {loading && (
+        <div className={styles.loadingState}>
+          <div className={styles.spinner} />
+          <p>Loading progress...</p>
+        </div>
+      )}
+      
+      {error && (
+        <div className={styles.errorState}>
+          <p>Failed to load progress. Please refresh the page.</p>
+          <button onClick={refetch} className={styles.retryBtn}>Retry</button>
+        </div>
+      )}
 
-        <section className={styles.card}>
-          <div className={styles.cardHeader}>
-            <div>
-              <h2 className={styles.cardTitle}>Progress Overview</h2>
-              <p className={styles.cardSubtitle}>Goal: Interview ready in 3 months</p>
+      {!loading && !error && (
+        <div className={styles.gridContainer}>
+          <section className={styles.card}>
+            <div className={styles.cardHeader}>
+              <div>
+                <h2 className={styles.cardTitle}>Skill Heatmap</h2>
+                <p className={styles.cardSubtitle}>
+                  {progress?.skill_data && Object.keys(progress.skill_data).length > 0 
+                    ? 'Track your skill development across categories' 
+                    : 'Complete challenges to build your skills'}
+                </p>
+              </div>
             </div>
-          </div>
-          <div className={styles.cardBodySmall}>
-            <ProgressTracker />
-          </div>
-        </section>
+            <div className={styles.cardBody}>
+              <SkillHeatmap data={progress?.skill_data} />
+            </div>
+          </section>
+
+          <section className={styles.card}>
+            <div className={styles.cardHeader}>
+              <div>
+                <h2 className={styles.cardTitle}>Progress Overview</h2>
+                <p className={styles.cardSubtitle}>Goal: Interview ready in 3 months</p>
+              </div>
+            </div>
+            <div className={styles.cardBodySmall}>
+              <ProgressTracker data={progress || undefined} />
+            </div>
+          </section>
 
         <section className={`${styles.card} ${styles.fullWidthCard}`}>
           <div className={styles.cardHeader}>
@@ -67,6 +116,7 @@ export default function Dashboard() {
           </div>
         </section>
       </div>
+      )}
     </div>
   );
 }

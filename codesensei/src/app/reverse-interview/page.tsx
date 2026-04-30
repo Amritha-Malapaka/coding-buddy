@@ -1,76 +1,83 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import styles from "./page.module.css";
+import { interviewApi } from "@/lib/api";
 
-interface Evaluation {
-  score: string;
-  feedback: string;
-  accuracy: number;
+interface Problem {
+  problem_id: number;
+  title: string;
+  difficulty: string;
+  language: string;
+  code: string;
+  issues_count: number;
+}
+
+interface EvaluationResult {
+  score: number;
+  feedback: {
+    detected_issues: number;
+    total_issues: number;
+    missed_issues: Array<{ type: string; description: string; keywords: string[]; fix: string }>;
+  };
+  optimal_solution: string | null;
 }
 
 export default function ReverseInterviewPage() {
   const [userSuggestion, setUserSuggestion] = useState("");
   const [isEvaluating, setIsEvaluating] = useState(false);
+  const [isLoadingProblem, setIsLoadingProblem] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
+  const [evaluation, setEvaluation] = useState<EvaluationResult | null>(null);
+  const [problem, setProblem] = useState<Problem | null>(null);
 
-  const snippet = `function binarySearch(arr, target) {
-  let left = 0;
-  let right = arr.length; // Bug 1
-
-  while (left <= right) {
-    let mid = Math.floor((left + right) / 2); // Bug 2
+  // Load problem from API
+  const loadProblem = useCallback(async () => {
+    setIsLoadingProblem(true);
+    setError(null);
     
-    if (arr[mid] === target) return mid;
-    if (arr[mid] < target) left = mid; // Bug 3
-    else right = mid - 1;
-  }
-  return -1;
-}`;
+    try {
+      const data = await interviewApi.getProblem();
+      setProblem(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load problem");
+    } finally {
+      setIsLoadingProblem(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadProblem();
+  }, [loadProblem]);
 
   const handleEvaluate = useCallback(async () => {
-    if (!userSuggestion.trim()) return;
+    if (!userSuggestion.trim() || !problem) return;
     
     setError(null);
     setIsEvaluating(true);
     
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
-      // Generate different feedback based on input
-      const feedbackLength = userSuggestion.length;
-      let score: string;
-      let accuracy: number;
-      let feedback: string;
-      
-      if (feedbackLength < 50) {
-        score = "Beginner";
-        accuracy = 45;
-        feedback = "Your review was brief. Try to be more thorough in identifying edge cases and potential issues.";
-      } else if (feedbackLength < 150) {
-        score = "Intermediate";
-        accuracy = 65;
-        feedback = "Good effort identifying some issues. You caught the main logic bug but missed the off-by-one error with arr.length.";
-      } else {
-        score = "Advanced";
-        accuracy = 85;
-        feedback = "Excellent review! You identified most of the issues including the boundary condition error and the potential for infinite loops.";
-      }
-      
-      setEvaluation({ score, feedback, accuracy });
+      const result = await interviewApi.submitReview(problem.problem_id, userSuggestion);
+      setEvaluation(result);
     } catch (err) {
-      setError("Evaluation failed. Please try again.");
+      setError(err instanceof Error ? err.message : "Evaluation failed. Please try again.");
     } finally {
       setIsEvaluating(false);
     }
-  }, [userSuggestion]);
+  }, [userSuggestion, problem]);
 
   const handleNext = useCallback(() => {
     setEvaluation(null);
     setUserSuggestion("");
     setError(null);
-  }, []);
+    loadProblem();
+  }, [loadProblem]);
+
+  const getScoreLabel = (score: number): string => {
+    if (score < 50) return "Beginner";
+    if (score < 80) return "Intermediate";
+    return "Advanced";
+  };
 
   return (
     <div className={styles.container}>
@@ -83,18 +90,29 @@ export default function ReverseInterviewPage() {
         </div>
       </header>
 
+      {isLoadingProblem ? (
+        <div className={styles.loadingState}>
+          <div className={styles.spinner} />
+          <p>Loading problem...</p>
+        </div>
+      ) : error && !problem ? (
+        <div className={styles.errorState}>
+          <p>{error}</p>
+          <button className={styles.retryBtn} onClick={loadProblem}>Retry</button>
+        </div>
+      ) : problem ? (
       <div className={styles.layout}>
         <div className={styles.codePanel}>
           <div className={styles.cardHeader}>
-            <h3>Code Review: Binary Search</h3>
-            <span className={styles.difficulty}>Medium</span>
+            <h3>{problem.title}</h3>
+            <span className={styles[problem.difficulty.toLowerCase()]}>{problem.difficulty}</span>
           </div>
           <pre className={styles.codeBlock}>
-            <code>{snippet}</code>
+            <code>{problem.code}</code>
           </pre>
           <div className={styles.hintSection}>
             <span className={styles.hintLabel}>Hint:</span>
-            <span className={styles.hintText}>Look for boundary conditions and termination guarantees.</span>
+            <span className={styles.hintText}>Look for boundary conditions and termination guarantees. ({problem.issues_count} issues to find)</span>
           </div>
         </div>
 
@@ -130,23 +148,47 @@ export default function ReverseInterviewPage() {
             <div className={styles.evaluationResult}>
               <div className={styles.scoreHeader}>
                 <h3>Evaluation</h3>
-                <span className={`${styles.scoreBadge} ${styles[evaluation.score.toLowerCase()]}`}>
-                  {evaluation.score}
+                <span className={`${styles.scoreBadge} ${styles[getScoreLabel(evaluation.score).toLowerCase()]}`}>
+                  {getScoreLabel(evaluation.score)}
                 </span>
               </div>
-              <p className={styles.feedbackText}>{evaluation.feedback}</p>
-
+              
               <div className={styles.metrics}>
                 <div className={styles.metric}>
                   <span className={styles.metricLabel}>Accuracy</span>
                   <div className={styles.progressBar}>
                     <div
                       className={styles.progressFill}
-                      style={{ width: `${evaluation.accuracy}%` }}
+                      style={{ width: `${evaluation.score}%` }}
                     />
                   </div>
-                  <span className={styles.metricValue}>{evaluation.accuracy}%</span>
+                  <span className={styles.metricValue}>{evaluation.score}%</span>
                 </div>
+              </div>
+
+              <div className={styles.feedbackSection}>
+                <p className={styles.feedbackText}>
+                  Detected {evaluation.feedback.detected_issues} of {evaluation.feedback.total_issues} issues
+                </p>
+                
+                {evaluation.feedback.missed_issues.length > 0 && (
+                  <div className={styles.missedIssues}>
+                    <h4>Missed Issues:</h4>
+                    {evaluation.feedback.missed_issues.map((issue, idx) => (
+                      <div key={idx} className={styles.missedIssue}>
+                        <strong>{issue.description}</strong>
+                        <p>Fix: {issue.fix}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {evaluation.optimal_solution && (
+                  <div className={styles.optimalSolution}>
+                    <h4>Optimal Solution:</h4>
+                    <pre><code>{evaluation.optimal_solution}</code></pre>
+                  </div>
+                )}
               </div>
 
               <button className={styles.nextBtn} onClick={handleNext}>
@@ -156,6 +198,7 @@ export default function ReverseInterviewPage() {
           )}
         </div>
       </div>
+      ) : null}
     </div>
   );
 }
